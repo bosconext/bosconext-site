@@ -14,14 +14,23 @@
   --ink-soft:#5b5149;     /* 文字色（やわらかい） */
   --brand:#d4202a;        /* メインの赤（ユニフォーム） */
   --brand-600:#b0151f;    /* 濃い赤（ホバー用） */
+  --brand-300:#ff5a52;    /* 明るい赤（グロー用） */
   --dark-700:#221d1a;     /* 暗い背景（黒／サッシュ・パンツ） */
+  --dark-800:#171310;     /* 中間の黒 */
   --dark-900:#100d0b;     /* いちばん暗い黒 */
   --gold:#f4c01e;         /* アクセント（背番号のゴールド） */
+  --gold-300:#ffd94a;     /* 明るいゴールド */
   --gold-600:#cf9b00;     /* 濃いゴールド */
   --line:rgba(26,22,19,.12);
   --shadow:0 22px 48px -26px rgba(15,11,9,.5);
   --shadow-sm:0 8px 20px -12px rgba(15,11,9,.4);
+  --glow-red:0 0 0 1px rgba(212,32,42,.25), 0 18px 50px -18px rgba(212,32,42,.55);
+  --glow-gold:0 0 0 1px rgba(244,192,30,.3), 0 18px 50px -18px rgba(244,192,30,.5);
+  --grad-red:linear-gradient(135deg,var(--brand-300),var(--brand) 45%,var(--brand-600));
+  --grad-gold:linear-gradient(135deg,var(--gold-300),var(--gold) 55%,var(--gold-600));
+  --grad-dark:linear-gradient(160deg,var(--dark-700),var(--dark-900));
   --radius:18px;
+  --radius-lg:26px;
   --maxw:1180px;
 }
 
@@ -61,6 +70,7 @@ a{color:inherit;text-decoration:none}
 
 /* ---------- ボタン ---------- */
 .btn{
+  position:relative;overflow:hidden;
   display:inline-flex;align-items:center;gap:.5em;
   font-weight:700;font-family:"Zen Kaku Gothic New",sans-serif;
   padding:.85em 1.5em;border-radius:999px;
@@ -68,10 +78,17 @@ a{color:inherit;text-decoration:none}
   transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
   white-space:nowrap;
 }
-.btn-primary{background:var(--brand);color:#fff;box-shadow:var(--shadow-sm)}
-.btn-primary:hover{transform:translateY(-3px);background:var(--brand-600);box-shadow:0 16px 30px -14px rgba(212,32,42,.6)}
-.btn-gold{background:var(--gold);color:var(--dark-900);box-shadow:var(--shadow-sm)}
-.btn-gold:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(244,192,30,.6)}
+/* ボタンの上を光が滑るエフェクト */
+.btn::after{
+  content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:skewX(-18deg);transition:left .55s ease;pointer-events:none;
+}
+.btn:hover::after{left:130%}
+.btn-primary{background:var(--grad-red);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 18px 34px -14px rgba(212,32,42,.65)}
+.btn-gold{background:var(--grad-gold);color:var(--dark-900);box-shadow:var(--shadow-sm)}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 18px 34px -14px rgba(244,192,30,.65)}
 .btn-ghost{border-color:rgba(255,255,255,.55);color:#fff}
 .btn-ghost:hover{background:#fff;color:var(--dark-900);transform:translateY(-3px)}
 .btn-dark{background:var(--dark-900);color:#fff;box-shadow:var(--shadow-sm)}
@@ -84,10 +101,16 @@ a{color:inherit;text-decoration:none}
    ===================================================================== */
 header{
   position:sticky;top:0;z-index:60;
-  background:rgba(247,243,236,.85);
-  backdrop-filter:blur(10px);
+  background:rgba(247,243,236,.82);
+  backdrop-filter:blur(14px) saturate(1.2);
+  -webkit-backdrop-filter:blur(14px) saturate(1.2);
   border-bottom:1px solid var(--line);
+  transition:box-shadow .3s ease, background .3s ease;
 }
+header.scrolled{box-shadow:0 10px 30px -20px rgba(15,11,9,.6);background:rgba(247,243,236,.94)}
+/* スクロール進捗バー */
+.scroll-progress{position:absolute;left:0;bottom:-1px;height:3px;width:0;background:var(--grad-red);
+  box-shadow:0 0 12px rgba(212,32,42,.6);z-index:2;transition:width .1s linear}
 .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
 .brand{display:flex;align-items:center;gap:.5em;font-family:"Anton",sans-serif;font-size:1.5rem;letter-spacing:.04em;color:var(--brand)}
 .brand .ball{width:26px;height:26px;border-radius:50%;background:
@@ -131,31 +154,52 @@ header{
   background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
   background-size:26px 26px;pointer-events:none;
 }
-.hero-inner{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding:clamp(48px,7vw,86px) 0 clamp(54px,7vw,90px)}
+/* ゆっくり動くスポットライトのグロー */
+.hero-glow{position:absolute;inset:-20% -10% auto auto;width:60vw;height:60vw;max-width:720px;max-height:720px;
+  background:radial-gradient(circle, rgba(212,32,42,.38), transparent 62%);
+  filter:blur(8px);pointer-events:none;animation:heroFloat 14s ease-in-out infinite alternate;z-index:0}
+.hero-glow.g2{inset:auto auto -25% -12%;background:radial-gradient(circle, rgba(244,192,30,.22), transparent 60%);animation-duration:18s;animation-delay:-6s}
+@keyframes heroFloat{from{transform:translate(0,0) scale(1)}to{transform:translate(-6%,7%) scale(1.12)}}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding:clamp(48px,7vw,86px) 0 clamp(54px,7vw,90px)}
 .eyebrow{display:inline-flex;align-items:center;gap:.6em;font-weight:700;font-size:.85rem;letter-spacing:.08em;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);padding:.45em 1em;border-radius:999px;margin-bottom:22px}
-.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(244,192,30,.3)}
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);padding:.45em 1em;border-radius:999px;margin-bottom:22px;
+  backdrop-filter:blur(4px)}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 0 rgba(244,192,30,.5);animation:pulseDot 2.2s ease-out infinite}
+@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(244,192,30,.55)}70%{box-shadow:0 0 0 10px rgba(244,192,30,0)}100%{box-shadow:0 0 0 0 rgba(244,192,30,0)}}
 .hero h1{font-family:"Anton",sans-serif;font-weight:400;line-height:.92;letter-spacing:.02em;
-  font-size:clamp(3.2rem,12vw,6.8rem);margin-bottom:.1em}
-.hero h1 .ja{display:block;font-family:"Zen Kaku Gothic New";font-weight:900;font-size:clamp(1rem,3.4vw,1.5rem);letter-spacing:.18em;color:rgba(255,255,255,.8);margin-top:.5em}
+  font-size:clamp(3.2rem,12vw,6.8rem);margin-bottom:.1em;
+  background:linear-gradient(180deg,#fff 40%,#e9ddca);-webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 20px 50px rgba(0,0,0,.35)}
+.hero h1 .ja{display:block;font-family:"Zen Kaku Gothic New";font-weight:900;font-size:clamp(1rem,3.4vw,1.5rem);letter-spacing:.18em;color:rgba(255,255,255,.8);
+  -webkit-text-fill-color:rgba(255,255,255,.8);margin-top:.5em;text-shadow:none}
 .tagline{font-family:"Dela Gothic One",sans-serif;font-size:clamp(1.5rem,5.6vw,2.7rem);line-height:1.35;margin:.5em 0 .1em}
-.tagline .hl{color:var(--gold)}
+.tagline .hl{color:var(--gold);position:relative;background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .hero-badges{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 30px}
-.hero-badges span{font-size:.8rem;font-weight:700;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
-  padding:.5em .95em;border-radius:10px;letter-spacing:.02em}
+.hero-badges span{font-size:.8rem;font-weight:700;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
+  padding:.5em .95em;border-radius:10px;letter-spacing:.02em;transition:transform .2s ease,border-color .2s ease,background .2s ease}
+.hero-badges span:hover{transform:translateY(-2px);border-color:rgba(244,192,30,.5);background:rgba(244,192,30,.12)}
 .hero-cta{display:flex;flex-wrap:wrap;gap:14px}
 .hero-meta{margin-top:26px;font-size:.82rem;color:rgba(255,255,255,.6);letter-spacing:.04em}
 
 /* ヒーロー右側の写真 */
 .hero-photo{position:relative}
-.hero-photo .frame{border-radius:22px;overflow:hidden;border:6px solid rgba(255,255,255,.92);box-shadow:0 40px 70px -30px rgba(0,0,0,.6);transform:rotate(2deg)}
-.hero-photo .frame img{width:100%;height:420px;object-fit:cover}
-.hero-photo .score{position:absolute;left:-18px;bottom:24px;background:var(--gold);color:var(--dark-900);
-  font-family:"Dela Gothic One";font-size:1.05rem;padding:.7em 1.1em;border-radius:14px;box-shadow:var(--shadow);transform:rotate(-3deg);line-height:1.3;max-width:230px}
-.hero-photo .score small{display:block;font-family:"Zen Kaku Gothic New";font-weight:700;font-size:.7rem;opacity:.8;letter-spacing:.04em}
+.hero-photo .frame{position:relative;border-radius:22px;overflow:hidden;box-shadow:0 40px 80px -30px rgba(0,0,0,.75);transform:rotate(2deg);
+  padding:6px;background:linear-gradient(135deg,#fff,rgba(255,255,255,.6));
+  transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.hero-photo .frame::before{content:"";position:absolute;inset:0;border-radius:22px;padding:2px;
+  background:var(--grad-gold);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;opacity:.9;pointer-events:none}
+.hero-photo .frame img{width:100%;height:420px;object-fit:cover;border-radius:17px}
+.hero-photo:hover .frame{transform:rotate(0deg) scale(1.01)}
+.hero-photo .score{position:absolute;left:-18px;bottom:24px;background:var(--grad-gold);color:var(--dark-900);
+  font-family:"Dela Gothic One";font-size:1.05rem;padding:.7em 1.1em;border-radius:14px;box-shadow:var(--glow-gold);transform:rotate(-3deg);line-height:1.3;max-width:230px}
+.hero-photo .score small{display:block;font-family:"Zen Kaku Gothic New";font-weight:700;font-size:.7rem;opacity:.85;letter-spacing:.04em}
 
 /* 速報ティッカー */
-.ticker{background:var(--gold);color:var(--dark-900);position:relative;overflow:hidden;border-top:3px solid var(--dark-900)}
+.ticker{background:var(--grad-gold);color:var(--dark-900);position:relative;overflow:hidden;border-top:3px solid var(--dark-900);border-bottom:3px solid var(--dark-900)}
+.ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none}
+.ticker::before{left:0;background:linear-gradient(90deg,var(--gold),transparent)}
+.ticker::after{right:0;background:linear-gradient(270deg,var(--gold-600),transparent)}
 .ticker-track{display:flex;gap:48px;white-space:nowrap;padding:11px 0;width:max-content;animation:scroll 32s linear infinite;font-weight:700;font-size:.95rem}
 .ticker:hover .ticker-track{animation-play-state:paused}
 .ticker-track span{display:inline-flex;align-items:center;gap:.5em}
@@ -472,3 +516,83 @@ table.ltable{width:100%;border-collapse:collapse;min-width:520px}
 .pm-info dd{margin:0;color:var(--ink);font-size:.95rem;line-height:1.6}
 .pm-empty{padding:16px 22px 26px;color:var(--ink-soft)}
 @media(max-width:480px){ .pm-info{grid-template-columns:1fr;gap:3px 0} .pm-info dd{margin:0 0 10px} .pm-no{font-size:2.1rem} }
+
+/* =====================================================================
+   ▼▼▼  デザイン強化レイヤー（v2）  ▼▼▼
+   既存の見た目を活かしつつ、ヒーロー演出・戦績バンド・
+   セクション装飾などを追加しています。
+   ===================================================================== */
+
+/* ---- ヒーローの登場アニメーション（読み込み時にふわっと） ---- */
+.hero-inner > div > .eyebrow,
+.hero-inner > div > h1,
+.hero-inner > div > .tagline,
+.hero-inner > div > .hero-badges,
+.hero-inner > div > .hero-cta,
+.hero-inner > div > .hero-meta{
+  opacity:0;animation:heroUp .8s cubic-bezier(.2,.7,.2,1) forwards;
+}
+.hero-inner > div > .eyebrow{animation-delay:.05s}
+.hero-inner > div > h1{animation-delay:.16s}
+.hero-inner > div > .tagline{animation-delay:.28s}
+.hero-inner > div > .hero-badges{animation-delay:.4s}
+.hero-inner > div > .hero-cta{animation-delay:.5s}
+.hero-inner > div > .hero-meta{animation-delay:.6s}
+.hero-photo{opacity:0;animation:heroPhoto 1s cubic-bezier(.2,.7,.2,1) .35s forwards}
+@keyframes heroUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes heroPhoto{from{opacity:0;transform:translateY(30px) rotate(4deg)}to{opacity:1;transform:rotate(2deg)}}
+
+/* ---- 戦績・データバンド（ヒーロー直下） ---- */
+.stats-band{background:var(--dark-900);color:#fff;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.08)}
+.stats-band::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(90% 140% at 15% 0%, rgba(212,32,42,.28), transparent 55%);pointer-events:none}
+.stats-inner{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  max-width:var(--maxw);margin:0 auto;padding:clamp(26px,4vw,40px) 22px}
+.stat{text-align:center;padding:10px 8px;position:relative}
+.stat + .stat::before{content:"";position:absolute;left:0;top:20%;bottom:20%;width:1px;background:rgba(255,255,255,.12)}
+.stat .num{font-family:"Anton",sans-serif;line-height:1;
+  font-size:clamp(2.2rem,7vw,3.4rem);
+  background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  display:inline-flex;align-items:baseline;gap:.08em}
+.stat .num .suf{font-size:.5em;-webkit-text-fill-color:rgba(255,255,255,.85);color:rgba(255,255,255,.85)}
+.stat .lbl{margin-top:8px;font-size:clamp(.72rem,2.2vw,.85rem);font-weight:700;color:rgba(255,255,255,.72);letter-spacing:.04em}
+@media(max-width:620px){
+  .stats-inner{grid-template-columns:repeat(2,1fr);gap:14px 8px}
+  .stat:nth-child(3)::before,.stat:nth-child(1)+.stat::before{content:none}
+  .stat + .stat::before{content:none}
+}
+
+/* ---- セクション見出しをリッチに ---- */
+.kicker::before{background:var(--grad-gold);border-radius:2px}
+.sec-title{position:relative}
+
+/* お知らせカードの左アクセントをグラデに、ホバーで発光 */
+.news-card{transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+.news-card::before{background:var(--grad-red);width:5px;transition:width .25s ease}
+.news-card:hover{border-color:rgba(212,32,42,.35)}
+.news-card:hover::before{width:8px}
+
+/* 次の一戦カードに動くゴールドの縁取り＋発光 */
+.next-match{box-shadow:var(--shadow), 0 0 0 1px rgba(244,192,30,.14)}
+.next-match::before{content:"";position:absolute;inset:0;border-radius:24px;padding:1.5px;
+  background:linear-gradient(120deg,rgba(244,192,30,.7),transparent 40%,transparent 60%,rgba(212,32,42,.6));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.nm-date .d{text-shadow:0 6px 24px rgba(244,192,30,.35)}
+
+/* SNSカード：アイコンをふわっと */
+.sns-card{transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+.sns-card:hover{border-color:rgba(212,32,42,.3)}
+.sns-card .ic{transition:transform .25s ease}
+.sns-card:hover .ic{transform:scale(1.15) rotate(-4deg)}
+
+/* 出現アニメの質感を少し上げる（カードは少しずつ遅らせて表示） */
+.reveal{transform:translateY(28px)}
+.news-grid .reveal:nth-child(2){transition-delay:.08s}
+.news-grid .reveal:nth-child(3){transition-delay:.16s}
+
+/* 動きを減らす設定の人にはアニメを止める */
+@media(prefers-reduced-motion:reduce){
+  .hero-glow,.eyebrow .dot,
+  .hero-inner > div > *,.hero-photo{animation:none!important;opacity:1!important;transform:none!important}
+}

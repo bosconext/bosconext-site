@@ -20,6 +20,8 @@
 
 <!-- ========== ヒーロー ========== -->
 <section class="hero" id="top">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="hero-glow g2" aria-hidden="true"></div>
   <div class="wrap hero-inner">
     <div>
       <span class="eyebrow"><span class="dot"></span><span id="eyebrowText"></span></span>
@@ -40,6 +42,16 @@
 </section>
 
 <div class="ticker"><div class="ticker-track" id="ticker"></div></div>
+
+<!-- ========== 戦績・チームデータ（数字でひと目で） ========== -->
+<section class="stats-band" aria-label="チームの数字">
+  <div class="stats-inner" id="statsBand">
+    <div class="stat"><span class="num" data-count="3"><span class="v">0</span><span class="suf">連覇</span></span><span class="lbl">東京都大会 制覇</span></div>
+    <div class="stat"><span class="num" data-count="13" data-since="2013"><span class="v">0</span><span class="suf">年</span></span><span class="lbl">活動年数（2013〜）</span></div>
+    <div class="stat"><span class="num" data-count="15"><span class="v">0</span><span class="suf">名</span></span><span class="lbl">チームメンバー</span></div>
+    <div class="stat"><span class="num" data-count="1"><span class="v">0</span><span class="suf">名</span></span><span class="lbl">強化指定選手 輩出</span></div>
+  </div>
+</section>
 
 <!-- ========== お知らせ ========== -->
 <section class="block" id="news">
@@ -286,6 +298,39 @@ $("snsLinks").innerHTML = [
 }).join("");
 
 observeReveals();
+
+/* ===== 戦績バンドの数字をカウントアップ ===== */
+(function(){
+  var band = document.getElementById("statsBand");
+  if(!band) return;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var nums = band.querySelectorAll(".num");
+  /* 活動年数は今年から自動計算（2013年〜） */
+  nums.forEach(function(n){
+    var since = n.getAttribute("data-since");
+    if(since){ n.setAttribute("data-count", String(new Date().getFullYear() - parseInt(since,10))); }
+  });
+  function run(n){
+    var target = parseInt(n.getAttribute("data-count"),10) || 0;
+    var el = n.querySelector(".v");
+    if(reduce){ el.textContent = target; return; }
+    var start = null, dur = 1100;
+    function step(t){
+      if(start===null) start = t;
+      var p = Math.min((t-start)/dur, 1);
+      var eased = 1 - Math.pow(1-p, 3);
+      el.textContent = Math.round(target * eased);
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ run(e.target); io.unobserve(e.target); }
+    });
+  },{threshold:.4});
+  nums.forEach(function(n){ io.observe(n); });
+})();
 </script>
 </body>
 </html>
