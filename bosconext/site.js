@@ -63,7 +63,8 @@ function renderHeader(){
         '<ul class="nav-links">'+links+'</ul>'+
         '<div class="nav-cta"><a class="btn btn-dark" href="'+esc(SITE_INFO.links.join)+'">⚽ 体験・入部</a></div>'+
         '<button class="burger" id="burger" aria-label="メニュー"><span></span><span></span><span></span></button>'+
-      '</div>';
+      '</div>'+
+      '<div class="scroll-progress" id="scrollProgress"></div>';
   }
 
   var all = SITE_INFO.nav.concat(SITE_INFO.morePages);
@@ -123,10 +124,20 @@ function initChrome(){
     mm.addEventListener("click",function(e){if(e.target.tagName==="A"){burger.classList.remove("open");mm.classList.remove("open");}});
   }
   var toTop = document.getElementById("toTop");
-  if(toTop){
-    window.addEventListener("scroll",function(){toTop.classList.toggle("show", window.scrollY>500);});
-    toTop.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"});});
+  var header = document.getElementById("site-header");
+  var progress = document.getElementById("scrollProgress");
+  function onScroll(){
+    var y = window.scrollY || window.pageYOffset;
+    if(toTop){ toTop.classList.toggle("show", y>500); }
+    if(header){ header.classList.toggle("scrolled", y>10); }
+    if(progress){
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.width = (h>0 ? (y/h*100) : 0) + "%";
+    }
   }
+  window.addEventListener("scroll", onScroll, {passive:true});
+  onScroll();
+  if(toTop){ toTop.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"});}); }
   /* data-link="join" などのボタンに、上の links のURLを自動で設定 */
   document.querySelectorAll("[data-link]").forEach(function(el){
     var u = SITE_INFO.links[el.getAttribute("data-link")];
