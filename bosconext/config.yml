@@ -1,34 +1,40 @@
 # ============================================================
 #  BOSCO NEXT CMS 設定
 #
-#  ▼ あとで直すのは backend の中の2か所だけ：
-#     ・repo          … あなたの「GitHubユーザー名/リポジトリ名」
-#     ・identity_url   … DecapBridgeが表示する値
+#  編集画面： https://weekendclub.github.io/bosconext/admin/
 #
-#  ※ このサイトはリポジトリ内の bosconext/ フォルダに移動しました。
-#     GitHubアカウント名は weekendclub にリネーム済みです。
-#     DecapBridge/Netlify側の連携先リポジトリも
-#     weekendclub/weekendclub.github.io に更新してください。
+#  ▼ ログインを有効にするには「1回だけ」外部設定が必要です。
+#     手順は 編集ガイド.md の「編集画面(/admin)のログイン設定」を参照。
+#     → GitHubでOAuthアプリを作り、Netlify側に登録するだけ（無料）
+#
+#  ※ サイト本体はリポジトリ内の bosconext/ フォルダにあります。
+#     そのため下の file: は全て bosconext/ から始まります。
 # ============================================================
 backend:
-  name: git-gateway
-  repo: weekendclub/weekendclub.github.io                  # ← リネーム後のリポジトリ名
-
-  branch: main                                              # ← 基本ブランチ（通常 main）
-  identity_url: https://auth.decapbridge.com/sites/あなたのサイトID   # ← DecapBridgeの値に置き換え
-  gateway_url: https://gateway.decapbridge.com
+  name: github                                   # GitHubアカウントでログインする方式
+  repo: weekendclub/weekendclub.github.io        # 対象リポジトリ
+  branch: main                                   # 保存先ブランチ
   commit_messages:
-    create: 'Create {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via DecapBridge'
-    update: 'Update {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via DecapBridge'
-    delete: 'Delete {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via DecapBridge'
-    uploadMedia: 'Upload "{{path}}" - {{author-name}} <{{author-login}}> via DecapBridge'
-    deleteMedia: 'Delete "{{path}}" - {{author-name}} <{{author-login}}> via DecapBridge'
+    create: 'Create {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via CMS'
+    update: 'Update {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via CMS'
+    delete: 'Delete {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via CMS'
+    uploadMedia: 'Upload "{{path}}" - {{author-name}} <{{author-login}}> via CMS'
+    deleteMedia: 'Delete "{{path}}" - {{author-name}} <{{author-login}}> via CMS'
+
+# --- 参考：DecapBridgeを使う場合は、上の backend を消して下を使う -----------
+# backend:
+#   name: git-gateway
+#   repo: weekendclub/weekendclub.github.io
+#   branch: main
+#   identity_url: https://auth.decapbridge.com/sites/【あなたのサイトID】
+#   gateway_url: https://gateway.decapbridge.com
+# ---------------------------------------------------------------------------
 
 locale: ja
 
-# （任意）公開URLが決まったらコメントを外す
-# site_url: https://bosconext-futsal.netlify.app
-# display_url: https://bosconext-futsal.netlify.app
+# 編集画面の「表示」ボタンから公開サイトへ飛べるようにする
+site_url: https://weekendclub.github.io/bosconext/
+display_url: https://weekendclub.github.io/bosconext/
 
 media_folder: bosconext/images/uploads
 public_folder: /bosconext/images/uploads
