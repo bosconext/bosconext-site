@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /bosconext/admin/
+Disallow: /docs/
 
 Sitemap: https://weekendclub.github.io/sitemap.xml
 Sitemap: https://weekendclub.github.io/bosconext/sitemap.xml
