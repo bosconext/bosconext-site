@@ -14,6 +14,11 @@ backend:
   name: github                                   # GitHubアカウントでログインする方式
   repo: weekendclub/weekendclub.github.io        # 対象リポジトリ
   branch: main                                   # 保存先ブランチ
+  # ▼ 重要：ログイン(OAuth)の窓口はNetlifyを借りています。
+  #    Netlifyは「どのサイトの設定か」をドメインで判定するため、
+  #    GitHub Pages から開く場合はNetlify側のドメインを明示する必要があります。
+  #    これが無いと「Not Found」になります。
+  site_domain: bosconext.netlify.app
   commit_messages:
     create: 'Create {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via CMS'
     update: 'Update {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via CMS'
