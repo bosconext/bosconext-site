@@ -7,6 +7,30 @@
 <meta name="robots" content="noindex, nofollow">
 <title>BOSCO NEXT｜サイト編集</title>
 
+<!-- ============================================================
+     ログイン用ドメインへの自動転送
+
+     ログイン(OAuth)の窓口はNetlifyを借りています。Netlifyは認証後、
+     トークンを「自分のドメイン宛て」に返す作りになっているため、
+     GitHub Pages(weekendclub.github.io)から開くと、
+     GitHubで許可したあとログインが完了しません。
+     そこで、Netlify以外から開かれた場合は自動で転送します。
+
+     ※ 将来DecapBridge等の独自ログイン窓口に変えた場合は、
+        この<script>ブロックごと削除してください。
+     ============================================================ -->
+<script>
+(function () {
+  var AUTH_HOST = 'bosconext.netlify.app';   // ログインできるドメイン
+  var here = location.hostname;
+  // ローカル確認用のアドレスは転送しない
+  var isLocal = (here === 'localhost' || here === '127.0.0.1' || here === '');
+  if (here !== AUTH_HOST && !isLocal) {
+    location.replace('https://' + AUTH_HOST + location.pathname + location.search + location.hash);
+  }
+})();
+</script>
+
 <!--
   設定ファイルは 1つ上の階層（bosconext/config.yml）を読み込みます。
   ※ 項目を増やしたいときは config.yml のほうを編集してください。
